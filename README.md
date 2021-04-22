@@ -10,13 +10,12 @@ I was a hydrogeologist working in consulting for several years. I was frequently
 
 After that I learned how to write production code at a tech company as a UI person. Now I am a grad student back in hydrogeology, and I want to do what I did before but using free open source tools, and I want to share how.
 
-## Requirements:
+## Requirements/tools used:
 
-Python38
-Vedo (only works with python38 at the time of this writing)
-Flopy
-pykrige (for some of it)
-Some pandas and numpy
+- Vedo (only works with python38 at the time of this writing)
+- Flopy
+- pykrige (only for some of it)
+- pandas and numpy
 
 ## Note
 Sample data is from a site in Luxembourg that I may do my PhD work on.
