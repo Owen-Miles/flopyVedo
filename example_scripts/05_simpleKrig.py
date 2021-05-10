@@ -30,8 +30,8 @@ inpnts = Points(in_pts[["x", "y", "z"]].values,
 ok3d = OrdinaryKriging3D(
     x, y, z, val, variogram_model="linear",nlags=10)
 
-# next, use points not a grid. Could help with some grid nonsense later.
-opntx = np.arange(float(min(x)), max(x), 1)  # note: must be float
+# the output points
+opntx = np.arange(float(min(x)), max(x), 1)  
 opnty = np.arange(float(min(y)), max(y), 1)
 opntz = np.arange(float(min(z)), max(z), 1)
 

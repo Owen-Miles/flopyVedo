@@ -44,7 +44,7 @@ for row in dem:
         xcoord += cellsize
     ycoord -= cellsize
 land_surface = pd.DataFrame(
-    data={'x': x, 'y': y, 'z': z}).iloc[::20]  # note a crude resample
+    data={'x': x, 'y': y, 'z': z}).iloc[::20]  # note this last bit a crude resample to 1:20 points, because we really don't need huge resolution
 
 landSurface = vd.delaunay2D(land_surface.values + [0,0,1000]) # plot it
 zvals = landSurface.points()[:, 2] # get the z values to color it
@@ -57,7 +57,7 @@ active_domain = [(xllcorner, yllcorner),
                  (xllcorner, yllcorner+total_y),
                  (xllcorner+total_x, yllcorner+total_y),
                  (xllcorner+total_x, yllcorner)]
-max_area = total_x*total_y / 600  # Discretization: 300 triangles
+max_area = total_x*total_y / 300  # Discretization: 300 triangles
 
 # Tringle mesh creation
 tri = Triangle(angle=30, model_ws=workspace, exe_name=triExeName)

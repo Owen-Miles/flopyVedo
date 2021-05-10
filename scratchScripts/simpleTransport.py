@@ -3,7 +3,7 @@ import pandas as pd
 # import vedo as vedo
 import flopy
 from flopy.utils.triangle import Triangle as Triangle
-
+import os as os
 import matplotlib.pyplot as mplt
 
 workspace = "./working/"
@@ -19,10 +19,12 @@ domain = [
     (100, 0)
 ]
 
+discretization = 100*100/10
+
 print('build triangles...')
 
 tri.add_polygon(domain)
-tri.add_region((10, 10), 0, maximum_area=20)
+tri.add_region((10, 10), 0, maximum_area=discretization)
 tri.build()
 
 cell2d = tri.get_cell2d()  # [index,cx,cy,nvert,v1,(v2),(v3)]
@@ -30,9 +32,9 @@ vertices = tri.get_vertices()  # verticy: [index, x, y]
 ncpl = tri.ncpl  # number of cells per layer
 nvert = tri.nvert  # number of vertex pairs
 
-# # optional 2D plot of the triangle gird
-tri.plot(edgecolor='red')
-mplt.show()
+# # # optional 2D plot of the triangle gird
+# tri.plot(edgecolor='red')
+# mplt.show()
 
 print('build GWF model...')
 
@@ -76,14 +78,46 @@ ic = flopy.mf6.ModflowGwfic(gwf, strt=10.0)
 
 # make boundaries
 chdList = []
-leftcells = tri.get_edge_cells(4) # not 0 indexed
+leftcells = tri.get_edge_cells(4)  # not 0 indexed
 rightcells = tri.get_edge_cells(2)
 
-for icpl in leftcells: chdList.append([(0, icpl), 30])
-for icpl in rightcells: chdList.append([(0, icpl), 20])
+for icpl in leftcells:
+    chdList.append([(0, icpl), 30])
+for icpl in rightcells:
+    chdList.append([(0, icpl), 20])
 
 chd = flopy.mf6.ModflowGwfchd(gwf, stress_period_data=chdList)
 
-sim.write_simulation()
+# output controls
+oc = flopy.mf6.ModflowGwfoc(gwf,
+                            budget_filerecord='{}.cbc'.format(name),
+                            head_filerecord='{}.hds'.format(name),
+                            saverecord=[('HEAD', 'LAST'),
+                                        ('BUDGET', 'LAST')],
+                            printrecord=[('HEAD', 'LAST'),
+                                         ('BUDGET', 'LAST')])
 
-success, buff = sim.run_simulation()
+
+print('run GWF model...')
+
+# sim.write_simulation()
+
+# success, buff = sim.run_simulation()
+
+
+print('process outputs from GWF model...')
+
+# Outputs
+#
+# note there is an option to produce vtk files from the binary.
+
+fname = os.path.join(workspace, name + '.hds')  # TODO: Dict filepaths
+
+hdobj = flopy.utils.HeadFile(fname, precision='double')
+head = hdobj.get_data()
+
+ax = mplt.subplot(1, 1, 1, aspect='equal')
+img = tri.plot(ax=ax, a=head[0, 0, :], cmap='Spectral')
+mplt.colorbar(img, fraction=0.02)
+mplt.show()
+
